@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/css/common.css">
+    <title>Main page</title>
+</head>
+<body>
+<div class="page-wrapper">
+    <div>
+        <a th:text="${currentUser.fullName()}" th:href="@{/me}"></a>
+    </div>
+    <div>
+        <a href="/users">Пользователи</a>
+    </div>
+    <div class="container">
+        <div class="header-container">
+            <div class="header__text">
+                <h2>All Posts</h2>
+            </div>
+        </div>
+        <div>
+            <a href="/posts/create">Create post</a>
+        </div>
+        <br><br>
+        <div th:with="isPostsEmpty=${posts == null or posts.isEmpty()}" class="records-container">
+            <div th:if="${isPostsEmpty}" class="hint">
+                <span>There are no posts!</span>
+            </div>
+            <div th:if="${!isPostsEmpty}" th:each="post: ${posts}" class="record">
+                <div class="record__title">
+                    <a th:text="${post.title}" th:href="@{/posts/{postId}(postId=${post.id})}"></a>
+                </div>
+                <div th:text="${post.text()}">
+
+                </div>
+                <div th:if="${post.postImageContainerDto() != null && !post.postImageContainerDto().getPostImages().isEmpty()}">
+                    <div th:each="image : ${post.postImageContainerDto().getPostImages()}">
+                        <div>
+                            <img th:src="${'http://localhost:8080/api'+image.imageUrl()}" alt="Post image" style="max-width: 200px; margin: 5px;">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

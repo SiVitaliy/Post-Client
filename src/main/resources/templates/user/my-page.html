@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${currentUserWithPosts!=null ? currentUserWithPosts.userDto().fullName() : 'Профиль пользователя'  }"></title>
+
+</head>
+<body>
+
+<br>
+<a href="/posts">На главную</a>
+<br>
+<div th:if="${currentUserWithPosts.userDto().profilePictureUrl() != null}">
+    <img th:src="'http://localhost:8080/api'+${currentUserWithPosts.userDto().profilePictureUrl()}" alt="Profile Picture" width="150" height="150">
+</div>
+<div th:unless="${currentUserWithPosts.userDto().profilePictureUrl() != null}">
+    <img src="/images/default-profile.png" alt="Default" width="150" height="150">
+</div>
+<!-- Шапка профиля -->
+<div>
+    <div>
+        <div th:text="${currentUserWithPosts.userDto().fullName()}"></div>
+        <div th:text="${currentUserWithPosts.userDto().email()}"></div>
+        <div th:text="${currentUserWithPosts.userDto().bio()}"></div>
+        <div th:text="${currentUserWithPosts.userDto().yearOfBirth()}"></div>
+     </div>
+    <div>
+        <a href="/me/update">Update</a>
+    </div>
+ </div>
+
+ <!-- Вкладки
+<div>
+    <button>Мои посты</button>
+    <button>Мои комментарии</button>
+</div>
+-->
+<!-- Посты пользователя -->
+
+<br><br><br><br>
+<div th:if="${!currentUserWithPosts.postContainerDto().getPosts().isEmpty()}">
+    <div th:each="post : ${currentUserWithPosts.postContainerDto().getPosts()}">
+        <div>
+            <a th:text="${post.title()}" th:href="@{posts/{id}(id=${post.id()})}" ></a>
+            <div th:text="${post.creationDate()}"></div>
+            <div th:text="${post.text()}"></div>
+<!--            <div th:text="${post.numberOfLikes()}"></div>-->
+<!--            <div th:text="${post.numberOfDislikes()}"></div>-->
+        </div>
+        <div th:if="${post.postImageContainerDto() != null && !post.postImageContainerDto().getPostImages().isEmpty()}">
+            <div th:each="image : ${post.postImageContainerDto().getPostImages()}">
+                <div>
+                    <img th:src="${'http://localhost:8080/api'+image.imageUrl()}" alt="Post image" style="max-width: 200px; margin: 5px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Если нет постов -->
+<div th:if="${currentUserWithPosts.postContainerDto().getPosts().isEmpty()}">
+    <p>У пользователя пока нет постов.</p>
+</div>
+
+</body>
+</html>

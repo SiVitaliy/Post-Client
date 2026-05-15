@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Пользователи</title>
+</head>
+<body>
+
+<br>
+<a href="/posts">На главную</a>
+<br>
+<form method="get" th:action="@{/users}">
+    <input type="text" name="search" placeholder="Поиск по имени..."
+           th:value="${search}">
+    <button type="submit">Найти</button>
+    <a th:href="@{/users}" th:unless="${search == null}">Сбросить</a>
+</form>
+
+<br>
+
+<!-- Список пользователей -->
+<div th:if="${users.getUsers() != null && !users.getUsers().isEmpty()}">
+    <div th:each="user : ${users.getUsers()}" style="margin-bottom: 10px;">
+
+        <div th:if="${user.profilePictureUrl() != null}">
+            <img th:src="'http://localhost:8080/api'+${user.profilePictureUrl()}" alt="Profile Picture" width="150" height="150">
+        </div>
+        <div th:unless="${user.profilePictureUrl() != null}">
+            <img src="/images/default-profile.png" alt="Default" width="150" height="150">
+        </div>
+        <a th:href="@{/user/{id}(id=${user.id()})}"
+           th:text="${user.fullName()}"></a>
+
+    </div>
+</div>
+
+<div th:unless="${users.getUsers() != null && !users.getUsers().isEmpty()}">
+    <p>Пользователи не найдены</p>
+</div>
+
+</body>
+</html>

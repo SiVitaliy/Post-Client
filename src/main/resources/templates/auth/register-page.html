@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration</title>
+</head>
+<body>
+<form method="post" action="/auth/perform_registration" th:object="${user}">
+  <label>
+    <input type="text" placeholder="Имя" th:field="*{fullName}"/>
+  </label>
+  <br>
+  <label>
+    <input type="text" placeholder="Элетронная почта" th:field="*{email}"/>
+  </label>
+  <br>
+  <label>
+    <input type="password"placeholder="Пароль" th:field="*{password}"/>
+  </label>
+  <button type="submit">Register</button>
+  <div th:if="${param.error}" style="color: red">
+    Неправильные имя или почта
+  </div>
+</form>
+</body>
+</html>

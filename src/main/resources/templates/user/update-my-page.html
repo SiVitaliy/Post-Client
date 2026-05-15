@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Обновление профиля</title>
+</head>
+<body>
+
+<br>
+<a href="/posts">На главную</a>
+<br>
+
+
+    <form th:action="@{/me/update}" th:object="${userToUpdate}" method="post"  enctype="multipart/form-data">
+
+
+        <div>
+            <label>Фото профиля:</label>
+
+            <div th:if="${userToUpdate.profilePictureUrl() != null}">
+                <img th:src="'http://localhost:8080/api'+${userToUpdate.profilePictureUrl()}" alt="Profile Picture" width="150" height="150">
+            </div>
+            <div th:unless="${userToUpdate.profilePictureUrl() != null}">
+                <img src="/images/default-profile.png" alt="Default" width="150" height="150">
+            </div>
+
+            <div th:if="${userToUpdate.profilePictureUrl() != null}">
+                <img th:src="${userToUpdate.profilePictureUrl()}"
+                     alt="Текущий аватар"
+                     style="max-width: 150px; border-radius: 50%;">
+                <p>Текущее фото</p>
+            </div>
+            <input type="file" name="profilePicture" accept="image/*">
+            <small>Оставьте пустым, чтобы сохранить текущее фото</small>
+        </div>
+
+
+        <div>
+            <label>Полное имя:</label>
+            <input type="text"  th:value="${userToUpdate.fullName()}" th:field="*{fullName}" >
+        </div>
+
+        <div>
+            <label>Email:</label>
+            <input type="email" th:field="*{email}" th:value="${userToUpdate.email()}" required>
+        </div>
+
+        <div>
+            <label>Дата рождения:</label>
+            <input type="date" th:field="*{yearOfBirth}" th:value="${userToUpdate.yearOfBirth()}">
+        </div>
+
+        <div>
+            <label>Страна:</label>
+            <input type="text" th:field="*{countryCode}" th:value="${userToUpdate.countryCode()}" >
+        </div>
+
+        <div>
+            <label>О себе:</label>
+            <textarea th:field="*{bio}" th:value="${userToUpdate.bio()}" rows="5" ></textarea>
+        </div>
+
+        <div>
+            <button type="submit">Сохранить изменения</button>
+            <a th:href="@{/me}">Отмена</a>
+        </div>
+    </form>
+</body>
+</html>

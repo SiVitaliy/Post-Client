@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Update</title>
+</head>
+<body>
+
+<br>
+<a href="/posts">На главную</a>
+<br>
+<form method="post" th:action="@{/posts/{id}/update(id=${post.id()})}" th:object="${post}">
+    <div>
+        <label for="title">Заголовок:</label>
+        <br>
+        <input type="text" name="title" id="title" th:value="${post.title()}" th:field="*{title}" required>
+    </div>
+
+    <div>
+        <label for="text">Текст:</label>
+        <br>
+        <textarea name="text" id="text" rows="10" th:value="${post.text()}" th:field="*{text}" required></textarea>
+    </div>
+
+    <div>
+        <button type="submit">Обновить</button>
+    </div>
+</form>
+<div th:if="${post.postImageContainerDto() != null && !post.postImageContainerDto().getPostImages().isEmpty()}">
+    <div th:each="image : ${post.postImageContainerDto().getPostImages()}">
+        <div>
+            <img th:src="${'http://localhost:8080/api'+image.imageUrl()}" alt="Post image" style="max-width: 200px; margin: 5px;">
+        </div>
+    </div>
+</div>
+
+
+<!-- Комментарии -->
+<h2>Комментарии</h2>
+
+<!-- Список комментариев -->
+<div th:if="${!comments.getCommentaries().isEmpty()}">
+    <div th:each="comment : ${comments.getCommentaries()}" class="comment">
+        <div>
+            <strong th:text="${comment.author() != null ? comment.author().fullName() : '[Удалённый пользователь]'}"></strong>
+            <span th:text="'(' + ${comment.creationDate()} + ')'"></span>
+        </div>
+        <div th:text="${comment.text()}"></div>
+
+        <!-- Кнопка удаления комментария (автор поста может удалить любой комментарий) -->
+        <form th:action="@{/posts/{postId}/commentaries/{id}/delete(postId=${post.id()}, id=${comment.id()})}" method="post"
+              onsubmit="return confirm('Удалить этот комментарий?')">
+            <button type="submit">Удалить комментарий</button>
+        </form>
+        <hr>
+    </div>
+</div>
+<div th:unless="${!comments.getCommentaries().isEmpty()}">
+    <p>Нет комментариев.</p>
+</div>
+
+<a th:href="@{/posts/{id}(id=${post.id()})}">Назад к посту</a>
+
+</body>
+</html>

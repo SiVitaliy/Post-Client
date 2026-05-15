@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title th:text="${post.postDto().title()}">Post details page</title>
+</head>
+<body>
+
+<br>
+<a href="/posts">На главную</a>
+<br>
+<div class="page-wrapper">
+    <div class="container">
+        <div class="header-container">
+            <div class="header__text">
+                <h2 th:text="'Title: ' + ${post.postDto().title()}"></h2>
+            </div>
+        </div>
+        <div class="records-container">
+            <div class="record">
+                <div class="record__title">
+                    <span th:text="'Id: ' + ${post.postDto().id()}"></span>
+                </div>
+            </div>
+<!--            <div class="record">-->
+<!--                <div class="record__title">-->
+<!--                    <span th:text="'Author: ' + ${post.postDto().author() != null ? post.postDto().author().fullName() : '[Удаленный пользователь]'}"></span>-->
+<!--                </div>-->
+<!--            </div>-->
+            <div class="record">
+                <div class="record__title">
+                    <span>
+                        Author:
+                        <a th:if="${post.postDto().author() != null}"
+                           th:href="@{/user/{id}(id=${post.postDto().author().id()})}"
+                           th:text="${post.postDto().author().fullName()}"></a>
+                        <span th:unless="${post.postDto().author() != null}">[Удаленный пользователь]</span>
+                    </span>
+                </div>
+            </div>
+            <div class="record">
+                <div class="record__title">
+                    <span th:text="${post.postDto().text()}"></span>
+                </div>
+            </div>
+            <div class="record">
+                <div class="record__title">
+                    <span th:text="'Creation Date: ' + ${post.postDto().creationDate()}"></span>
+                </div>
+            </div>
+<!--            <div class="record">-->
+<!--                <div class="record__title">-->
+<!--                    <span th:text="'Number of Likes: ' + ${post.postDto().numberOfLikes()}"></span>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="record">-->
+<!--                <div class="record__title">-->
+<!--                    <span th:text="'Number of Dislikes: ' + ${post.postDto().numberOfDislikes()}"></span>-->
+<!--                </div>-->
+<!--            </div>-->
+            <div th:if="${post.postDto().postImageContainerDto() != null && !post.postDto().postImageContainerDto().getPostImages().isEmpty()}">
+                <div th:each="image : ${post.postDto().postImageContainerDto().getPostImages()}">
+                    <div>
+                        <img th:src="${'http://localhost:8080/api'+image.imageUrl()}" alt="Post image" style="max-width: 200px; margin: 5px;">
+                    </div>
+                </div>
+            </div>
+            <div th:unless="${post.postDto().postImageContainerDto() != null and !post.postDto().postImageContainerDto().getPostImages().isEmpty()}">
+<!--                <p>Нет изображений</p>-->
+            </div>
+
+
+
+        </div>
+    </div>
+
+
+
+    <!-- Кнопки редактирования/удаления поста (только для автора) -->
+    <div th:if="${post.postDto().author() != null and currentUser != null and currentUser.id() == post.postDto().author().id()}">
+        <a th:href="@{/posts/{id}/update(id=${post.postDto().id()})}">Update post</a>
+        <br>
+        <form th:action="@{/posts/{id}/delete(id=${post.postDto().id()})}" method="post"
+              onsubmit="return confirm('Вы уверены, что хотите удалить этот пост?')"
+              style="display: inline;">
+            <button type="submit">Delete post</button>
+        </form>
+    </div>
+
+    <br><br><br>
+
+    <!-- Комментарии -->
+    <div>Commentaries</div>
+    <br>
+
+    <!-- Форма добавления комментария -->
+    <form method="post" th:action="@{/posts/{id}/commentaries(id=${post.postDto().id()})}" th:object="${newCommentary}">
+        <label>
+            <textarea name="text" rows="3" placeholder="Оставить комментарий" th:field="*{text}"></textarea>
+        </label>
+        <div>
+            <button type="reset">Отмена</button>
+            <button type="submit">Оставить комментарий</button>
+        </div>
+    </form>
+
+    <br><br>
+
+    <!-- Список комментариев -->
+    <div th:if="${!post.commentaryContainerDto().getCommentaries().isEmpty()}"
+         th:each="comment : ${post.commentaryContainerDto().getCommentaries()}"
+         class="record">
+
+        <div class="record__title">
+            <!-- Имя автора комментария (или "Удалённый пользователь") -->
+<!--            <div th:text="${comment.author() != null ? comment.author().fullName() : '[Удалённый пользователь]'}">-->
+
+<!--            </div>-->
+            <div>
+
+
+                <div th:if="${comment.author() != null}">
+                    <div th:if="${comment.author().profilePictureUrl() != null}">
+                        <img th:src="'http://localhost:8080/api'+${comment.author().profilePictureUrl()}" alt="Profile Picture" width="150" height="150">
+                    </div>
+                    <div th:unless="${comment.author().profilePictureUrl() != null}">
+                        <img src="/images/default-profile.png" alt="Default" width="150" height="150">
+                    </div>
+                    <a th:href="@{/user/{id}(id=${comment.author().id()})}"
+                    th:text=" ${comment.author().fullName()}" ></a>
+                </div>
+                <span th:unless="${comment.author() != null}">[Удалённый пользователь]</span>
+            </div>
+
+            <!-- Текст комментария -->
+            <div th:text="${comment.text()}" th:id="'commentText-' + ${comment.id()}"></div>
+
+            <!-- Кнопки редактирования/удаления (только для автора комментария, если автор существует) -->
+            <div th:if="${comment.author() != null and currentUser != null and currentUser.id() == comment.author().id()}">
+                <button th:onclick="'showEditForm(' + ${comment.id()} + ')'">Edit</button>
+
+                <!-- Форма редактирования (скрыта по умолчанию) -->
+                <div th:id="'editForm-' + ${comment.id()}" style="display:none;">
+                    <form th:action="@{/posts/{postId}/commentaries/{id}(postId=${post.postDto().id()}, id=${comment.id()})}"
+                          method="post">
+                        <textarea th:id="'editText-' + ${comment.id()}" name="text" rows="2"
+                                  th:text="${comment.text()}"></textarea>
+                        <button type="submit">Сохранить</button>
+                        <button type="button" th:onclick="'hideEditForm(' + ${comment.id()} + ')'">Отмена</button>
+                    </form>
+                </div>
+
+                <!-- Форма удаления -->
+                <form th:action="@{/posts/{postId}/commentaries/{id}/delete(postId=${post.postDto().id()}, id=${comment.id()})}"
+                      method="post">
+                    <button type="submit">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${post.commentaryContainerDto().getCommentaries().isEmpty()}">
+        <p>Нет комментариев. Будьте первым!</p>
+    </div>
+
+    <script>
+        function showEditForm(commentId) {
+            document.getElementById('commentText-' + commentId).style.display = 'none';
+            document.getElementById('editForm-' + commentId).style.display = 'block';
+        }
+
+        function hideEditForm(commentId) {
+            document.getElementById('commentText-' + commentId).style.display = 'block';
+            document.getElementById('editForm-' + commentId).style.display = 'none';
+        }
+    </script>
+
+</div>
+</body>
+</html>
