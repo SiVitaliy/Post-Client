@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Registration</title>
+    <link rel="stylesheet" href="/css/registration.css" th:href="@{/css/registration.css}">
 </head>
 <body>
 <form method="post" action="/auth/perform_registration" th:object="${user}">
@@ -11,16 +12,18 @@
   </label>
   <br>
   <label>
-    <input type="text" placeholder="Элетронная почта" th:field="*{email}"/>
+    <input type="text" placeholder="Электронная почта" th:field="*{email}"/>
   </label>
   <br>
   <label>
-    <input type="password"placeholder="Пароль" th:field="*{password}"/>
+    <input type="password" placeholder="Пароль" th:field="*{password}"/>
   </label>
   <button type="submit">Register</button>
   <div th:if="${param.error}" style="color: red">
     Неправильные имя или почта
   </div>
+  <br>
+  Есть аккаунт? <a href="/auth/login">Войти</a>
 </form>
 </body>
 </html>

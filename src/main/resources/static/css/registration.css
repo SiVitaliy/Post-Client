@@ -1,0 +1,110 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #eef2ff, #f8fafc);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1f2937;
+}
+
+form {
+    width: 100%;
+    max-width: 380px;
+    padding: 36px 32px;
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
+    text-align: center;
+}
+
+form::before {
+    content: "Регистрация";
+    display: block;
+    margin-bottom: 26px;
+    font-size: 28px;
+    font-weight: 700;
+    text-align: center;
+    color: #111827;
+}
+
+label {
+    display: block;
+    margin-bottom: 14px;
+    text-align: left;
+}
+
+input {
+    width: 100%;
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input::placeholder {
+    color: #9ca3af;
+}
+
+input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+}
+
+button {
+    width: 100%;
+    height: 46px;
+    margin-top: 4px;
+    margin-bottom: 6px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 12px;
+    background: #4f46e5;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+    background: #4338ca;
+    box-shadow: 0 10px 20px rgba(79, 70, 229, 0.25);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+div[th\:if] {
+    margin-top: 16px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #fef2f2;
+    font-size: 14px;
+    text-align: center;
+}
+
+form > br {
+    display: none;
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 20px;
+    }
+
+    form {
+        padding: 28px 22px;
+        border-radius: 16px;
+    }
+}

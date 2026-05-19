@@ -3,23 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    <link rel="stylesheet" href="/css/login.css" th:href="@{/css/login.css}">
 </head>
 <body>
-<!--<form method="post" action="/auth/process_login">-->
-<!--    &lt;!&ndash;<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"> &ndash;&gt;-->
-<!--    <label for="username">Введите имя пользователя:</label>-->
-<!--    <input type="text" name="username" id="username"/>-->
-<!--    <br/>-->
-<!--    <label for="password">Введите пароль:</label>-->
-<!--    <input type="password" name="password" id="password"/>-->
-<!--    <br/>-->
-<!--    <input type="submit" value="Login"/>-->
 
-
-<!--</form>-->
 <form method="post" action="/auth/process_login" th:object="${user}">
     <label>
-        <input type="text" th:field="*{email}" placeholder="Элктронная почта"/>
+        <input type="text" th:field="*{email}" placeholder="Электронная почта"/>
     </label>
     <br>
     <label>

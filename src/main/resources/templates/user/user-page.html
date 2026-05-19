@@ -2,63 +2,126 @@
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${user!=null ? user.userDto().fullName() : '[Удаленный пользователь'  }"></title>
-
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title th:text="${user != null ? user.userDto().fullName() : 'Пользователь'}"></title>
+    <link rel="stylesheet" href="/css/user-profile.css">
 </head>
 <body>
+<div class="page-wrapper">
 
-<br>
-<a href="/posts">На главную</a>
-<br>
-<div th:if="${user.userDto().profilePictureUrl() != null}">
-    <img th:src="'http://localhost:8080/api'+${user.userDto().profilePictureUrl()}" alt="Profile Picture" width="150" height="150">
-</div>
-<div th:unless="${user.userDto().profilePictureUrl() != null}">
-    <img src="/images/default-profile.png" alt="Default" width="150" height="150">
-</div>
-<!-- Шапка профиля -->
-<div>
-    <div>
-        <div th:text="${user.userDto().fullName()}"></div>
-        <!--  <div>user@example.com</div>-->
-        <div th:text="${user.userDto().bio()}"></div>
-        <div th:text="${user.userDto().yearOfBirth()}"></div>
-    </div>
-</div>
+    <header class="page-header">
+        <div class="page-header__inner">
+            <a class="page-header__link" href="/posts">На главную</a>
 
-<!-- Вкладки
-<div>
-   <button>Мои посты</button>
-   <button>Мои комментарии</button>
-</div>
--->
-<!-- Посты пользователя -->
+            <a class="page-header__user" th:href="@{/me}">
+                <span th:text="${currentUser.fullName()}"></span>
 
-<br><br><br><br>
-<div th:if="${!user.postContainerDto().getPosts().isEmpty()}">
-    <div th:each="post : ${user.postContainerDto().getPosts()}">
-        <div>
-            <a th:text="${post.title()}" th:href="@{/posts/{id}(id=${post.id()})}" ></a>
-            <div th:text="${post.creationDate()}"></div>
-            <div th:text="${post.text()}"></div>
-<!--            <div th:text="${post.numberOfLikes()}"></div>-->
-<!--            <div th:text="${post.numberOfDislikes()}"></div>-->
+                <img class="page-header__avatar"
+                     th:if="${currentUser.profilePictureUrl() != null}"
+                     th:src="${'http://localhost:8080/api' + currentUser.profilePictureUrl()}"
+                     alt="Profile Picture">
+
+                <img class="page-header__avatar"
+                     th:unless="${currentUser.profilePictureUrl() != null}"
+                     src="/images/default-profile.png"
+                     alt="Default Profile Picture">
+            </a>
         </div>
-        <div th:if="${post.postImageContainerDto() != null && !post.postImageContainerDto().getPostImages().isEmpty()}">
-            <div th:each="image : ${post.postImageContainerDto().getPostImages()}">
-                <div>
-                    <img th:src="${'http://localhost:8080/api'+image.imageUrl()}" alt="Post image" style="max-width: 200px; margin: 5px;">
+    </header>
+
+    <main class="container">
+
+        <section class="profile-card">
+            <div class="profile-avatar-wrapper">
+                <img class="profile-avatar"
+                     th:if="${user.userDto().profilePictureUrl() != null}"
+                     th:src="${'http://localhost:8080/api' + user.userDto().profilePictureUrl()}"
+                     alt="Profile Picture">
+
+                <img class="profile-avatar"
+                     th:unless="${user.userDto().profilePictureUrl() != null}"
+                     src="/images/default-profile.png"
+                     alt="Default Profile Picture">
+            </div>
+
+            <div class="profile-info">
+                <h1 class="profile-name" th:text="${user.userDto().fullName()}"></h1>
+
+                <div class="profile-email profile-placeholder" aria-hidden="true">
+                    hidden@email.com
+                </div>
+
+                <div class="profile-bio"
+                     th:if="${user.userDto().bio() != null}"
+                     th:text="${user.userDto().bio()}">
+                </div>
+
+                <div class="profile-bio profile-placeholder"
+                     th:unless="${user.userDto().bio() != null}"
+                     aria-hidden="true">
+                    hidden bio placeholder
+                </div>
+
+                <div class="profile-year"
+                     th:if="${user.userDto().yearOfBirth() != null}">
+                    <span>Дата рождения:</span>
+                    <span th:text="${user.userDto().yearOfBirth()}"></span>
+                </div>
+
+                <div class="profile-year profile-placeholder"
+                     th:unless="${user.userDto().yearOfBirth() != null}"
+                     aria-hidden="true">
+                    <span>Дата рождения:</span>
+                    <span>2000-01-01</span>
                 </div>
             </div>
-        </div>
-    </div>
+
+            <div class="profile-actions profile-actions--placeholder" aria-hidden="true">
+                <a class="primary-button" href="#">Update</a>
+            </div>
+        </section>
+
+        <section class="posts-section">
+            <div class="section-header">
+                <h2>Посты пользователя</h2>
+            </div>
+
+            <div th:if="${!user.postContainerDto().getPosts().isEmpty()}"
+                 class="records-container">
+
+                <a th:each="post : ${user.postContainerDto().getPosts()}"
+                   class="record record-link"
+                   th:href="@{/posts/{id}(id=${post.id()})}">
+
+                    <div class="record__title" th:text="${post.title()}"></div>
+
+                    <div class="record__date"
+                         th:text="${post.creationDate() != null ? #temporals.format(post.creationDate(), 'dd.MM.yyyy HH:mm') : ''}">
+                    </div>
+
+                    <div class="record__text" th:text="${post.text()}"></div>
+
+                    <div class="post-images"
+                         th:if="${post.postImageContainerDto() != null && !post.postImageContainerDto().getPostImages().isEmpty()}">
+                        <div class="post-image-wrapper"
+                             th:each="image : ${post.postImageContainerDto().getPostImages()}">
+                            <img class="post-image"
+                                 th:src="${'http://localhost:8080/api' + image.imageUrl()}"
+                                 alt="Post image">
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div th:if="${user.postContainerDto().getPosts().isEmpty()}"
+                 class="hint">
+                <p>У пользователя пока нет постов.</p>
+            </div>
+        </section>
+
+    </main>
 
 </div>
-
-<!-- Если нет постов -->
-<div th:if="${user.postContainerDto().getPosts().isEmpty()}">
-    <p>У пользователя пока нет постов.</p>
-</div>
-
 </body>
 </html>

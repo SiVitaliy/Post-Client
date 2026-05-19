@@ -1,42 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <title>Пользователи</title>
+    <link rel="stylesheet" href="/css/users.css">
 </head>
 <body>
+<div class="page-wrapper">
 
-<br>
-<a href="/posts">На главную</a>
-<br>
-<form method="get" th:action="@{/users}">
-    <input type="text" name="search" placeholder="Поиск по имени..."
-           th:value="${search}">
-    <button type="submit">Найти</button>
-    <a th:href="@{/users}" th:unless="${search == null}">Сбросить</a>
-</form>
+    <header class="page-header">
+        <div class="page-header__inner">
+            <a class="page-header__link" href="/posts">На главную</a>
 
-<br>
+            <a class="page-header__user" th:href="@{/me}">
+                <span th:text="${currentUser.fullName()}"></span>
 
-<!-- Список пользователей -->
-<div th:if="${users.getUsers() != null && !users.getUsers().isEmpty()}">
-    <div th:each="user : ${users.getUsers()}" style="margin-bottom: 10px;">
+                <img class="page-header__avatar"
+                     th:if="${currentUser.profilePictureUrl() != null}"
+                     th:src="${'http://localhost:8080/api' + currentUser.profilePictureUrl()}"
+                     alt="Profile Picture">
 
-        <div th:if="${user.profilePictureUrl() != null}">
-            <img th:src="'http://localhost:8080/api'+${user.profilePictureUrl()}" alt="Profile Picture" width="150" height="150">
+                <img class="page-header__avatar"
+                     th:unless="${currentUser.profilePictureUrl() != null}"
+                     src="/images/default-profile.png"
+                     alt="Default Profile Picture">
+            </a>
         </div>
-        <div th:unless="${user.profilePictureUrl() != null}">
-            <img src="/images/default-profile.png" alt="Default" width="150" height="150">
+    </header>
+
+    <main class="container">
+        <div class="header-container">
+            <div class="header__text">
+                <h2>Пользователи</h2>
+            </div>
         </div>
-        <a th:href="@{/user/{id}(id=${user.id()})}"
-           th:text="${user.fullName()}"></a>
 
-    </div>
+        <form class="search-form" method="get" th:action="@{/users}">
+            <input class="search-input"
+                   type="text"
+                   name="search"
+                   placeholder="Поиск по имени..."
+                   th:value="${search}">
+
+            <button class="primary-button" type="submit">Найти</button>
+
+            <a class="secondary-button"
+               th:href="@{/users}"
+               th:unless="${search == null}">
+                Сбросить
+            </a>
+        </form>
+
+        <div th:if="${users.getUsers() != null && !users.getUsers().isEmpty()}"
+             class="users-grid">
+
+            <a th:each="user : ${users.getUsers()}"
+               class="user-card"
+               th:href="@{/user/{id}(id=${user.id()})}">
+
+                <img class="user-avatar"
+                     th:if="${user.profilePictureUrl() != null}"
+                     th:src="${'http://localhost:8080/api' + user.profilePictureUrl()}"
+                     alt="Profile Picture">
+
+                <img class="user-avatar"
+                     th:unless="${user.profilePictureUrl() != null}"
+                     src="/images/default-profile.png"
+                     alt="Default Profile Picture">
+
+                <div class="user-info">
+                    <div class="user-name" th:text="${user.fullName()}"></div>
+
+                    <div class="user-meta">
+                        Открыть профиль
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div th:unless="${users.getUsers() != null && !users.getUsers().isEmpty()}"
+             class="hint">
+            <p>Пользователи не найдены</p>
+        </div>
+    </main>
+
 </div>
-
-<div th:unless="${users.getUsers() != null && !users.getUsers().isEmpty()}">
-    <p>Пользователи не найдены</p>
-</div>
-
 </body>
 </html>

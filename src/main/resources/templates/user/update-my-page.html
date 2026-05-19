@@ -1,69 +1,140 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <title>Обновление профиля</title>
+    <link rel="stylesheet" href="/css/profile-update.css">
 </head>
 <body>
+<div class="page-wrapper">
 
-<br>
-<a href="/posts">На главную</a>
-<br>
+    <header class="page-header">
+        <div class="page-header__inner">
+            <a class="page-header__link" href="/posts">На главную</a>
+            <a class="page-header__link" th:href="@{/me}">Моя страница</a>
+        </div>
+    </header>
 
-
-    <form th:action="@{/me/update}" th:object="${userToUpdate}" method="post"  enctype="multipart/form-data">
-
-
-        <div>
-            <label>Фото профиля:</label>
-
-            <div th:if="${userToUpdate.profilePictureUrl() != null}">
-                <img th:src="'http://localhost:8080/api'+${userToUpdate.profilePictureUrl()}" alt="Profile Picture" width="150" height="150">
+    <main class="container">
+        <div class="header-container">
+            <div class="header__text">
+                <h2>Обновление профиля</h2>
             </div>
-            <div th:unless="${userToUpdate.profilePictureUrl() != null}">
-                <img src="/images/default-profile.png" alt="Default" width="150" height="150">
+        </div>
+
+        <form class="profile-form"
+              th:action="@{/me/update}"
+              th:object="${userToUpdate}"
+              method="post"
+              enctype="multipart/form-data">
+
+            <div class="avatar-section">
+                <label class="field-label">Фото профиля</label>
+
+                <div class="avatar-preview">
+                    <img id="profileAvatarPreview"
+                         class="profile-avatar"
+                         th:src="${userToUpdate.profilePictureUrl() != null
+             ? 'http://localhost:8080/api' + userToUpdate.profilePictureUrl()
+             : '/images/default-profile.png'}"
+                         alt="Profile Picture">
+                </div>
+
+                <label class="file-upload">
+                    <span>Выбрать новое фото</span>
+                    <input id="profilePictureInput"
+                           type="file"
+                           name="profilePicture"
+                           accept="image/*">
+                </label>
+
+                <small class="field-hint">
+                    Оставьте пустым, чтобы сохранить текущее фото
+                </small>
             </div>
 
-            <div th:if="${userToUpdate.profilePictureUrl() != null}">
-                <img th:src="${userToUpdate.profilePictureUrl()}"
-                     alt="Текущий аватар"
-                     style="max-width: 150px; border-radius: 50%;">
-                <p>Текущее фото</p>
+            <div class="form-grid">
+                <div class="form-field">
+                    <label class="field-label" for="fullName">Полное имя</label>
+                    <input id="fullName"
+                           type="text"
+                           th:field="*{fullName}"
+                           placeholder="Введите имя">
+                </div>
+
+                <div class="form-field">
+                    <label class="field-label" for="email">Email</label>
+                    <input id="email"
+                           type="email"
+                           th:field="*{email}"
+                           placeholder="Введите email"
+                           required>
+                </div>
+
+                <div class="form-field">
+                    <label class="field-label" for="yearOfBirth">Дата рождения</label>
+                    <input id="yearOfBirth"
+                           name="yearOfBirth"
+                           type="date"
+                           th:value="${userToUpdate.yearOfBirth() != null
+           ? #temporals.format(userToUpdate.yearOfBirth(), 'yyyy-MM-dd')
+           : ''}">
+                </div>
+
+                <div class="form-field">
+                    <label class="field-label" for="countryCode">Страна</label>
+                    <input id="countryCode"
+                           type="text"
+                           th:field="*{countryCode}"
+                           maxlength="2"
+                           placeholder="Например: RU">
+                </div>
+
+                <div class="form-field form-field--full">
+                    <label class="field-label" for="bio">О себе</label>
+                    <textarea id="bio"
+                              th:field="*{bio}"
+                              rows="5"
+                              placeholder="Расскажите немного о себе"></textarea>
+                </div>
             </div>
-            <input type="file" name="profilePicture" accept="image/*">
-            <small>Оставьте пустым, чтобы сохранить текущее фото</small>
-        </div>
 
+            <div class="form-actions">
+                <button class="primary-button" type="submit">Сохранить изменения</button>
+                <a class="secondary-button" th:href="@{/me}">Отмена</a>
+            </div>
+        </form>
+    </main>
 
-        <div>
-            <label>Полное имя:</label>
-            <input type="text"  th:value="${userToUpdate.fullName()}" th:field="*{fullName}" >
-        </div>
+</div>
 
-        <div>
-            <label>Email:</label>
-            <input type="email" th:field="*{email}" th:value="${userToUpdate.email()}" required>
-        </div>
+<script>
+    const profilePictureInput = document.getElementById('profilePictureInput');
+    const profileAvatarPreview = document.getElementById('profileAvatarPreview');
 
-        <div>
-            <label>Дата рождения:</label>
-            <input type="date" th:field="*{yearOfBirth}" th:value="${userToUpdate.yearOfBirth()}">
-        </div>
+    profilePictureInput.addEventListener('change', function () {
+        const file = this.files && this.files[0];
 
-        <div>
-            <label>Страна:</label>
-            <input type="text" th:field="*{countryCode}" th:value="${userToUpdate.countryCode()}" >
-        </div>
+        if (!file) {
+            return;
+        }
 
-        <div>
-            <label>О себе:</label>
-            <textarea th:field="*{bio}" th:value="${userToUpdate.bio()}" rows="5" ></textarea>
-        </div>
+        if (!file.type.startsWith('image/')) {
+            this.value = '';
+            alert('Можно выбрать только изображение');
+            return;
+        }
 
-        <div>
-            <button type="submit">Сохранить изменения</button>
-            <a th:href="@{/me}">Отмена</a>
-        </div>
-    </form>
+        const previewUrl = URL.createObjectURL(file);
+        profileAvatarPreview.src = previewUrl;
+
+        profileAvatarPreview.onload = function () {
+            URL.revokeObjectURL(previewUrl);
+        };
+    });
+</script>
+
 </body>
 </html>

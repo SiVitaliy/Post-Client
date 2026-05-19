@@ -60,7 +60,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login", "/auth/registration",
                                 "/error","/auth/process_login",
-                                "/auth/perform_registration").permitAll()
+                                "/auth/perform_registration", "/css/**").permitAll()
                         .anyRequest().authenticated()
                 )
                // .userDetailsService(userDetailsService())
