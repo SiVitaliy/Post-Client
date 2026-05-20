@@ -6,6 +6,7 @@ import com.example.postclientservice.client.UserClient;
 import com.example.postclientservice.dto.Dto.PostDto;
 import com.example.postclientservice.dto.WithDto.PostWithCommentariesDto;
 import com.example.postclientservice.dto.container.PostContainerDto;
+import com.example.postclientservice.dto.pageResponse.PageResponse;
 import com.example.postclientservice.dto.request.CommentaryRequest.CreateCommentaryRequest;
 import com.example.postclientservice.dto.request.PostRequest.CreatePostRequest;
 import com.example.postclientservice.dto.request.PostRequest.UpdatePostRequest;
@@ -30,18 +31,22 @@ public class PostController {
 
     @GetMapping("/posts")
     @PreAuthorize("hasRole('USER')")
-    public String getMainPage(Model model){
-        PostContainerDto posts = postClient.getAll();
-        model.addAttribute("posts", posts.getPosts());
+    public String getMainPage(@RequestParam(defaultValue="0")int page, Model model){
+        PageResponse<PostDto> postPage = postClient.getAll(page);
+
+        System.out.println(postPage.toString());
+        model.addAttribute("page", postPage);
         return  "main-page";
     }
 
 
     @GetMapping("/posts/{id}")
     @PreAuthorize("hasRole('USER')")
-    public String getPostDetailsPage(@PathVariable int id, Model model){
-        PostWithCommentariesDto post= postClient.getById(id);
-        System.out.println(post.postDto().author()==null);
+    public String getPostDetailsPage(@RequestParam(defaultValue = "0")  int commentPage,
+            @PathVariable int id, Model model){
+
+        PostWithCommentariesDto post= postClient.getById(id,commentPage);
+
         model.addAttribute("post",post);
         model.addAttribute("newCommentary",new CreateCommentaryRequest(""));
         return "post/details-page";
@@ -75,10 +80,10 @@ public class PostController {
 
     @GetMapping("/posts/{id}/update")
     @PreAuthorize("hasRole('USER')")
-    public String updatePostPage(@PathVariable int id, Model model){
-        PostWithCommentariesDto post= postClient.getById(id);
-        model.addAttribute("post",post.postDto());
-        model.addAttribute("comments",post.commentaryContainerDto());
+    public String updatePostPage(@RequestParam(defaultValue = "0")  int commentPage,
+                                 @PathVariable int id, Model model){
+        PostWithCommentariesDto post= postClient.getById(id,commentPage);
+        model.addAttribute("post");
         return "/post/update-post-page";
     }
     @PostMapping("/posts/{id}/update")

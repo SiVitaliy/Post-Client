@@ -5,15 +5,18 @@ import com.example.postclientservice.dto.Dto.PostDto;
 import com.example.postclientservice.dto.Dto.UserDto;
 import com.example.postclientservice.dto.WithDto.PostWithCommentariesDto;
 import com.example.postclientservice.dto.container.PostContainerDto;
+import com.example.postclientservice.dto.pageResponse.PageResponse;
 import com.example.postclientservice.dto.request.PostRequest.CreatePostRequest;
 import com.example.postclientservice.dto.request.PostRequest.UpdatePostRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,18 +43,26 @@ public class PostClient {
         return headers;
     }
 
-    public PostContainerDto getAll(){
+    public PageResponse<PostDto> getAll(int page){
         HttpEntity<?> entity = new HttpEntity<>(createAuthHeaders());
-        ResponseEntity<PostContainerDto> response = restTemplate.exchange(postUrl, HttpMethod.GET,entity, PostContainerDto.class);
+
+        String pageRequest = "?page="+page;
+        ResponseEntity<PageResponse<PostDto>> response = restTemplate.exchange(
+                postUrl+pageRequest,
+                HttpMethod.GET,entity,
+                new ParameterizedTypeReference<PageResponse<PostDto>>() {}
+        );
+
         if (response.getStatusCode().is2xxSuccessful()){
             return response.getBody();
         }
         throw new RuntimeException("getAll failed");
     }
 
-    public PostWithCommentariesDto getById(int id){
+    public PostWithCommentariesDto getById(int id,int commentPage){
         HttpEntity<?> entity = new HttpEntity<>(createAuthHeaders());
-        ResponseEntity<PostWithCommentariesDto> response = restTemplate.exchange(postUrl+"/"+id, HttpMethod.GET,entity, PostWithCommentariesDto.class);
+        String commentPageRequest = "?commentPage="+commentPage;
+        ResponseEntity<PostWithCommentariesDto> response = restTemplate.exchange(postUrl+"/"+id+commentPageRequest, HttpMethod.GET,entity, PostWithCommentariesDto.class);
         System.out.println(response.getBody());
         if (response.getStatusCode().is2xxSuccessful()){
             return response.getBody();

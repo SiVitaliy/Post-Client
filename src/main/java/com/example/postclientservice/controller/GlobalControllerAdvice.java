@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
 
-@ControllerAdvice(assignableTypes = CommonController.class)
+@ControllerAdvice
 public class GlobalControllerAdvice {
     private final HttpSession session;
 

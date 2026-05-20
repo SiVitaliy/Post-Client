@@ -42,13 +42,15 @@
             <a class="primary-button" href="/posts/create">Create post</a>
         </div>
 
-        <div th:with="isPostsEmpty=${posts == null or posts.isEmpty()}" class="records-container">
+        <div th:with="isPostsEmpty=${page == null or page.content().isEmpty()}"
+             class="records-container">
+
             <div th:if="${isPostsEmpty}" class="hint">
                 <span>There are no posts!</span>
             </div>
 
             <a th:if="${!isPostsEmpty}"
-               th:each="post : ${posts}"
+               th:each="post : ${page.content()}"
                class="record record-link"
                th:href="@{/posts/{postId}(postId=${post.id})}">
 
@@ -67,6 +69,40 @@
                 </div>
             </a>
         </div>
+
+        <nav class="pagination"
+             th:if="${page != null and page.totalPages() > 1}"
+             aria-label="Post pagination">
+
+            <a class="pagination__item pagination__arrow"
+               th:if="${page.hasPrevious()}"
+               th:href="@{/posts(page=${page.page() - 1})}">
+                &lt;
+            </a>
+
+            <span class="pagination__item pagination__arrow pagination__item--disabled"
+                  th:unless="${page.hasPrevious()}">
+                &lt;
+            </span>
+
+            <a th:each="pageNumber : ${#numbers.sequence(0, page.totalPages() - 1)}"
+               class="pagination__item"
+               th:classappend="${pageNumber == page.page()} ? ' pagination__item--active'"
+               th:href="@{/posts(page=${pageNumber})}"
+               th:text="${pageNumber + 1}">
+            </a>
+
+            <a class="pagination__item pagination__arrow"
+               th:if="${page.hasNext()}"
+               th:href="@{/posts(page=${page.page() + 1})}">
+                &gt;
+            </a>
+
+            <span class="pagination__item pagination__arrow pagination__item--disabled"
+                  th:unless="${page.hasNext()}">
+                &gt;
+            </span>
+        </nav>
     </main>
 
 </div>

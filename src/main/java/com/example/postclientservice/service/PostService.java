@@ -19,7 +19,7 @@ public class PostService {
 
     public boolean userIsPostAuthor(int postId){
         try {
-            PostWithCommentariesDto post =postClient.getById(postId); //TODO замменить пост с коментами на потс дто
+            PostWithCommentariesDto post =postClient.getById(postId,0); //TODO замменить пост с коментами на потс дто
             UserDto currentUser = (UserDto) session.getAttribute("user");
             return post.postDto().author().id()==currentUser.id();
         } catch (Exception e) {
