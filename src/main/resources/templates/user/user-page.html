@@ -63,17 +63,35 @@
                     hidden bio placeholder
                 </div>
 
-                <div class="profile-year"
-                     th:if="${user.userDto().yearOfBirth() != null}">
-                    <span>Дата рождения:</span>
-                    <span th:text="${user.userDto().yearOfBirth()}"></span>
-                </div>
+                <div class="profile-details">
+                    <div class="profile-year"
+                         th:if="${user.userDto().yearOfBirth() != null}">
+                        <span>Дата рождения:</span>
+                        <span th:text="${user.userDto().yearOfBirth()}"></span>
+                    </div>
 
-                <div class="profile-year profile-placeholder"
-                     th:unless="${user.userDto().yearOfBirth() != null}"
-                     aria-hidden="true">
-                    <span>Дата рождения:</span>
-                    <span>2000-01-01</span>
+                    <div class="profile-year profile-placeholder"
+                         th:unless="${user.userDto().yearOfBirth() != null}"
+                         aria-hidden="true">
+                        <span>Дата рождения:</span>
+                        <span>2000-01-01</span>
+                    </div>
+
+                    <div class="profile-country"
+                         th:if="${user.userDto().countryCode() != null}">
+                        <span>Страна:</span>
+                        <span th:text="${countryNames[user.userDto().countryCode()] != null
+                            ? countryNames[user.userDto().countryCode()]
+                            : user.userDto().countryCode()}">
+                        </span>
+                    </div>
+
+                    <div class="profile-country profile-placeholder"
+                         th:unless="${user.userDto().countryCode() != null}"
+                         aria-hidden="true">
+                        <span>Страна:</span>
+                        <span>Россия</span>
+                    </div>
                 </div>
             </div>
 

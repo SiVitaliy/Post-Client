@@ -13,7 +13,20 @@
     <header class="page-header">
         <div class="page-header__inner">
             <a class="page-header__link" href="/posts">На главную</a>
-            <a class="page-header__link" th:href="@{/me}">Моя страница</a>
+
+            <a class="page-header__user" th:href="@{/me}">
+                <span th:text="${currentUser.fullName()}"></span>
+
+                <img class="page-header__avatar"
+                     th:if="${currentUser.profilePictureUrl() != null}"
+                     th:src="${'http://localhost:8080/api' + currentUser.profilePictureUrl()}"
+                     alt="Profile Picture">
+
+                <img class="page-header__avatar"
+                     th:unless="${currentUser.profilePictureUrl() != null}"
+                     src="/images/default-profile.png"
+                     alt="Default Profile Picture">
+            </a>
         </div>
     </header>
 
@@ -30,15 +43,20 @@
               method="post"
               enctype="multipart/form-data">
 
+            <div th:if="${error != null}"
+                 class="form-error"
+                 th:text="${error}">
+            </div>
+
             <div class="avatar-section">
                 <label class="field-label">Фото профиля</label>
 
                 <div class="avatar-preview">
                     <img id="profileAvatarPreview"
                          class="profile-avatar"
-                         th:src="${userToUpdate.profilePictureUrl() != null
-             ? 'http://localhost:8080/api' + userToUpdate.profilePictureUrl()
-             : '/images/default-profile.png'}"
+                         th:src="${currentUser.profilePictureUrl() != null
+                            ? 'http://localhost:8080/api' + currentUser.profilePictureUrl()
+                            : '/images/default-profile.png'}"
                          alt="Profile Picture">
                 </div>
 
@@ -62,6 +80,11 @@
                            type="text"
                            th:field="*{fullName}"
                            placeholder="Введите имя">
+
+                    <div th:if="${#fields.hasErrors('fullName')}"
+                         class="field-error"
+                         th:errors="*{fullName}">
+                    </div>
                 </div>
 
                 <div class="form-field">
@@ -69,8 +92,12 @@
                     <input id="email"
                            type="email"
                            th:field="*{email}"
-                           placeholder="Введите email"
-                           required>
+                           placeholder="Введите email">
+
+                    <div th:if="${#fields.hasErrors('email')}"
+                         class="field-error"
+                         th:errors="*{email}">
+                    </div>
                 </div>
 
                 <div class="form-field">
@@ -79,17 +106,33 @@
                            name="yearOfBirth"
                            type="date"
                            th:value="${userToUpdate.yearOfBirth() != null
-           ? #temporals.format(userToUpdate.yearOfBirth(), 'yyyy-MM-dd')
-           : ''}">
+                ? #temporals.format(userToUpdate.yearOfBirth(), 'yyyy-MM-dd')
+                : ''}">
+
+                    <div th:if="${#fields.hasErrors('yearOfBirth')}"
+                         class="field-error"
+                         th:errors="*{yearOfBirth}">
+                    </div>
                 </div>
 
                 <div class="form-field">
                     <label class="field-label" for="countryCode">Страна</label>
-                    <input id="countryCode"
-                           type="text"
-                           th:field="*{countryCode}"
-                           maxlength="2"
-                           placeholder="Например: RU">
+
+                    <select id="countryCode"
+                            class="select-input"
+                            th:field="*{countryCode}">
+                        <option value="">Не указана</option>
+
+                        <option th:each="country : ${countries}"
+                                th:value="${country.code()}"
+                                th:text="${country.name()}">
+                        </option>
+                    </select>
+
+                    <div th:if="${#fields.hasErrors('countryCode')}"
+                         class="field-error"
+                         th:errors="*{countryCode}">
+                    </div>
                 </div>
 
                 <div class="form-field form-field--full">
@@ -98,6 +141,11 @@
                               th:field="*{bio}"
                               rows="5"
                               placeholder="Расскажите немного о себе"></textarea>
+
+                    <div th:if="${#fields.hasErrors('bio')}"
+                         class="field-error"
+                         th:errors="*{bio}">
+                    </div>
                 </div>
             </div>
 
@@ -135,6 +183,5 @@
         };
     });
 </script>
-
 </body>
 </html>

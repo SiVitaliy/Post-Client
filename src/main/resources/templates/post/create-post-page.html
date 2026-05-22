@@ -1,79 +1,120 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <title>Создать запись</title>
-    <style>
-        .image-preview {
-            margin-top: 10px;
-        }
-        .image-item {
-            display: inline-block;
-            margin: 10px;
-            position: relative;
-        }
-        .image-item img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .remove-btn {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: red;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/create-post.css">
 </head>
 <body>
+<div class="page-wrapper">
 
-<br>
-<a href="/posts">На главную</a>
-<br>
+    <header class="page-header">
+        <div class="page-header__inner">
+            <a class="page-header__link" href="/posts">На главную</a>
 
-<form method="post" th:action="@{/posts/create}" th:object="${post}" enctype="multipart/form-data" id="postForm">
-    <div>
-        <label for="title">Заголовок:</label>
-        <br>
-        <input type="text" id="title" th:field="*{title}" required>
-    </div>
+            <a class="page-header__user" th:href="@{/me}">
+                <span th:text="${currentUser.fullName()}"></span>
 
-    <div>
-        <label for="text">Текст:</label>
-        <br>
-        <textarea id="text" rows="10" th:field="*{text}" required></textarea>
-    </div>
+                <img class="page-header__avatar"
+                     th:if="${currentUser.profilePictureUrl() != null}"
+                     th:src="${'http://localhost:8080/api' + currentUser.profilePictureUrl()}"
+                     alt="Profile Picture">
 
-    <div>
-        <label>Картинки (максимум 5):</label>
-        <br>
-        <input type="file" id="imageInput" accept="image/*" style="display:none;">
-        <button type="button" onclick="document.getElementById('imageInput').click()">Добавить картинку</button>
-    </div>
+                <img class="page-header__avatar"
+                     th:unless="${currentUser.profilePictureUrl() != null}"
+                     src="/images/default-profile.png"
+                     alt="Default Profile Picture">
+            </a>
+        </div>
+    </header>
 
-    <div id="imageList" class="image-preview"></div>
-    <div th:if="${error != null}" style="color: red" th:text="${error}"></div>
+    <main class="container">
+        <div class="header-container">
+            <div class="header__text">
+                <h2>Создать запись</h2>
+            </div>
+        </div>
 
-    <div>
-        <button type="submit">Создать</button>
-    </div>
-</form>
+        <form class="post-form"
+              method="post"
+              th:action="@{/posts/create}"
+              th:object="${post}"
+              enctype="multipart/form-data"
+              id="postForm">
+
+            <div th:if="${error != null}"
+                 class="error-message"
+                 th:text="${error}">
+            </div>
+
+            <div class="form-field">
+                <label class="field-label" for="title">Заголовок</label>
+                <input class="text-input"
+                       type="text"
+                       id="title"
+                       th:field="*{title}"
+                       placeholder="Введите заголовок">
+
+                <div th:if="${#fields.hasErrors('title')}"
+                     class="field-error"
+                     th:errors="*{title}">
+                </div>
+            </div>
+
+            <div class="form-field">
+                <label class="field-label" for="text">Текст</label>
+                <textarea class="text-area"
+                          id="text"
+                          rows="10"
+                          th:field="*{text}"
+                          placeholder="Напишите текст поста"></textarea>
+
+                <div th:if="${#fields.hasErrors('text')}"
+                     class="field-error"
+                     th:errors="*{text}">
+                </div>
+            </div>
+
+            <div class="upload-section">
+                <div>
+                    <div class="field-label">Картинки</div>
+                    <div class="field-hint">Можно загрузить максимум 5 изображений, до 10 MB каждое</div>
+                </div>
+
+                <input type="file"
+                       id="imageInput"
+                       accept="image/*"
+                       class="hidden-file-input">
+
+                <button class="secondary-button"
+                        type="button"
+                        onclick="document.getElementById('imageInput').click()">
+                    Добавить картинку
+                </button>
+            </div>
+
+            <div id="imageList" class="image-preview"></div>
+
+            <div class="form-actions">
+                <button class="primary-button" type="submit">Создать</button>
+                <a class="secondary-button" href="/posts">Отмена</a>
+            </div>
+        </form>
+    </main>
+
+</div>
 
 <script>
     let images = [];
 
     document.getElementById('imageInput').addEventListener('change', function(e) {
         const file = e.target.files[0];
-        if (!file) return;
+
+        if (!file) {
+            return;
+        }
 
         if (!file.type.startsWith('image/')) {
             alert('Можно загружать только изображения');
@@ -94,19 +135,7 @@
         }
 
         images.push(file);
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const imageList = document.getElementById('imageList');
-            const div = document.createElement('div');
-            div.className = 'image-item';
-            div.innerHTML = `
-                <img src="` + e.target.result + `">
-                <button type="button" class="remove-btn" onclick="removeImage(` + (images.length - 1) + `)">×</button>
-            `;
-            imageList.appendChild(div);
-        };
-        reader.readAsDataURL(file);
+        renderImageList();
         this.value = '';
     });
 
@@ -118,18 +147,23 @@
     function renderImageList() {
         const imageList = document.getElementById('imageList');
         imageList.innerHTML = '';
+
         images.forEach((file, idx) => {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const div = document.createElement('div');
-                div.className = 'image-item';
-                div.innerHTML = `
-                    <img src="` + e.target.result + `">
-                    <button type="button" class="remove-btn" onclick="removeImage(` + idx + `)">×</button>
-                `;
-                imageList.appendChild(div);
+            const previewUrl = URL.createObjectURL(file);
+
+            const div = document.createElement('div');
+            div.className = 'image-item';
+            div.innerHTML = `
+                <img src="${previewUrl}" alt="Selected image">
+                <button type="button" class="remove-btn" onclick="removeImage(${idx})">×</button>
+            `;
+
+            const img = div.querySelector('img');
+            img.onload = function () {
+                URL.revokeObjectURL(previewUrl);
             };
-            reader.readAsDataURL(file);
+
+            imageList.appendChild(div);
         });
     }
 
@@ -138,7 +172,6 @@
 
         const formData = new FormData();
 
-        // Достаём значения из th:field (id)
         formData.append('title', document.getElementById('title').value);
         formData.append('text', document.getElementById('text').value);
 
@@ -149,7 +182,9 @@
         fetch('/posts/create', {
             method: 'POST',
             body: formData,
-            headers: { 'Accept': 'text/html' }
+            headers: {
+                'Accept': 'text/html'
+            }
         }).then(response => {
             if (response.redirected) {
                 window.location.href = response.url;
@@ -167,6 +202,5 @@
         });
     });
 </script>
-
 </body>
 </html>

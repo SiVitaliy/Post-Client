@@ -150,15 +150,31 @@ a:hover {
     line-height: 1.6;
 }
 
-.profile-year {
+.profile-details {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-year,
+.profile-country {
     display: inline-flex;
     gap: 6px;
     padding: 8px 12px;
     border-radius: 999px;
-    background: #eef2ff;
-    color: #3730a3;
     font-size: 14px;
     font-weight: 700;
+}
+
+.profile-year {
+    background: #eef2ff;
+    color: #3730a3;
+}
+
+.profile-country {
+    background: #ecfdf5;
+    color: #047857;
 }
 
 .profile-actions {
@@ -374,7 +390,12 @@ a:hover {
         font-size: 16px;
     }
 
-    .profile-year {
+    .profile-details {
+        justify-content: center;
+    }
+
+    .profile-year,
+    .profile-country {
         justify-content: center;
     }
 

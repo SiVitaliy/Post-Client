@@ -6,9 +6,11 @@ import com.example.postclientservice.client.UserClient;
 import com.example.postclientservice.dto.request.CommentaryRequest.CreateCommentaryRequest;
 import com.example.postclientservice.dto.request.CommentaryRequest.UpdateCommentaryRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,14 +28,18 @@ public class CommentaryController {
 
     @PostMapping("/posts/{id}/commentaries")
     @PreAuthorize("hasRole('USER')")
-    public String createCommentary(@PathVariable int id, CreateCommentaryRequest request ){
+    public String createCommentary(@PathVariable int id,  @ModelAttribute  CreateCommentaryRequest request, BindingResult bindingResult){
+
         commentaryClient.save(id,request);
         return "redirect:/posts/"+id;
     }
 
     @PostMapping("/posts/{postId}/commentaries/{id}")
     @PreAuthorize("hasRole('USER') and @commentaryService.userIsCommentaryAuthor(#id)")
-    public String updateCommentary(@PathVariable int postId, @PathVariable int id, @ModelAttribute UpdateCommentaryRequest request){
+    public String updateCommentary(@PathVariable int postId, @PathVariable int id,
+                                    @ModelAttribute UpdateCommentaryRequest request,
+                                   BindingResult bindingResult){
+
         commentaryClient.updateById(id,request);
         return "redirect:/posts/"+postId;
     }

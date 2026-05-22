@@ -126,3 +126,21 @@ form div {
         border-radius: 16px;
     }
 }
+.field-error {
+    margin-top: 6px;
+    color: #dc2626;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.form-error {
+    margin-top: 14px;
+    color: #dc2626;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.auth-link {
+    margin-top: 4px;
+}

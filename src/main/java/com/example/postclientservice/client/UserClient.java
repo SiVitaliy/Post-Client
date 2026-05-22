@@ -7,6 +7,10 @@ import com.example.postclientservice.dto.container.UserContainerDto;
 import com.example.postclientservice.dto.request.UserRequest.LoginUserRequest;
 import com.example.postclientservice.dto.request.UserRequest.RegisterUserRequest;
 import com.example.postclientservice.dto.request.UserRequest.UpdateUserRequest;
+import com.example.postclientservice.util.BadLoginException;
+import com.example.postclientservice.util.ClientApiException;
+import com.example.postclientservice.util.ClientForbiddenException;
+import com.example.postclientservice.util.EmailAlreadyExistsException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +19,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,27 +55,43 @@ public class UserClient {
     }
 
     public JwtResponseDto register(RegisterUserRequest user) {
-        ResponseEntity<JwtResponseDto> response = restTemplate.postForEntity(
-                registerUrl, user, JwtResponseDto.class);
-        if (response.getStatusCode().is2xxSuccessful()) {
-            return response.getBody();
+        try {
+            ResponseEntity<JwtResponseDto> response = restTemplate.postForEntity(
+                    registerUrl, user, JwtResponseDto.class);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return response.getBody();
+            }
+        } catch (HttpClientErrorException.Conflict ex){
+            throw new EmailAlreadyExistsException("Такой email уже зарегистрирован");
         }
-        throw new RuntimeException("Register failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
     }
     public JwtResponseDto login(LoginUserRequest user){
-        ResponseEntity<JwtResponseDto> response = restTemplate.postForEntity(
-                loginUrl, user, JwtResponseDto.class);
-        if (response.getStatusCode().is2xxSuccessful()) {
-            return response.getBody();
+        try {
+            ResponseEntity<JwtResponseDto> response = restTemplate.postForEntity(
+                    loginUrl, user, JwtResponseDto.class);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return response.getBody();
+            }
+        }  catch (HttpClientErrorException.Unauthorized ex) {
+              throw new BadLoginException("Неравильная почта или пароль");
+
+        } catch (HttpClientErrorException.Forbidden ex) {
+             throw new ClientForbiddenException("Нет доступа");
+
         }
-        throw new RuntimeException("Login failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
+
+
     }
+
+
     public UserDto getByEmail(String email){
         ResponseEntity<UserDto> response= restTemplate.getForEntity(userUrl+"/"+email, UserDto.class);
         if (response.getStatusCode().is2xxSuccessful()){
             return response.getBody();
         }
-        throw new RuntimeException("findByEmail failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
     }
 
     public UserWithPostsDto getUserPosts(int id){
@@ -77,7 +100,7 @@ public class UserClient {
         if (response.getStatusCode().is2xxSuccessful()){
             return response.getBody();
         }
-        throw new RuntimeException("findByEmail failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
     }
     public UserWithPostsDto getCurrentUserPosts(){
         HttpEntity<?> entity = new HttpEntity<>(createAuthHeaders());
@@ -86,7 +109,7 @@ public class UserClient {
         if (response.getStatusCode().is2xxSuccessful()){
             return response.getBody();
         }
-        throw new RuntimeException("findByEmail failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
     }
 
 
@@ -97,7 +120,7 @@ public class UserClient {
         if (response.getStatusCode().is2xxSuccessful()){
             return response.getBody();
         }
-        throw new RuntimeException("findByEmail failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
     }
 
     public UserDto getCurrentUserFromSession(){
@@ -105,14 +128,18 @@ public class UserClient {
     }
 
     public UserDto updateCurrentUser(UpdateUserRequest request) {
-        HttpEntity<?> entity = new HttpEntity<>(request,createAuthHeaders());
-        UserDto currentUser = getCurrentUserFromSession();
-        ResponseEntity<UserDto> response = restTemplate.exchange(baseUrl+"/me",HttpMethod.PUT,entity, UserDto.class);
-        if (response.getStatusCode().is2xxSuccessful()){
-            session.setAttribute("user",response.getBody());
-            return response.getBody();
+        try {
+            HttpEntity<?> entity = new HttpEntity<>(request,createAuthHeaders());
+            UserDto currentUser = getCurrentUserFromSession();
+            ResponseEntity<UserDto> response = restTemplate.exchange(baseUrl+"/me",HttpMethod.PUT,entity, UserDto.class);
+            if (response.getStatusCode().is2xxSuccessful()){
+                session.setAttribute("user",response.getBody());
+                return response.getBody();
+            }
+        } catch (HttpClientErrorException.Conflict ex){
+            throw new EmailAlreadyExistsException("Такой email уже зарегистрирован");
         }
-        throw new RuntimeException("updateCurrentUser failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
 
 
     }
@@ -125,7 +152,7 @@ public class UserClient {
             SecurityContextHolder.clearContext();
             return;
         }
-        throw new RuntimeException("Delete method failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
     }
 
     public UserContainerDto getAllUsers(String search) {
@@ -145,7 +172,7 @@ public class UserClient {
         if (response.getStatusCode().is2xxSuccessful()){
             return response.getBody();
         }
-        throw new RuntimeException("getAllUsers failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
     }
 
     public UserDto updateCurrentUserProfilePicture(MultipartFile profilePicture) {
@@ -163,6 +190,6 @@ public class UserClient {
             session.setAttribute("user",response.getBody());
             return response.getBody();
         }
-        throw new RuntimeException("updateCurrentUserProfilePicture failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
     }
 }

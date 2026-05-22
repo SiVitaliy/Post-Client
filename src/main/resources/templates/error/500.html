@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Ошибка сервера</title>
+    <link rel="stylesheet" href="/css/error-page.css">
+</head>
+<body>
+<div class="page-wrapper">
+
+    <main class="error-card">
+        <div class="error-code">500</div>
+
+        <h1>Что-то пошло не так</h1>
+
+        <p th:text="${message != null ? message : 'Сервер временно недоступен. Попробуйте позже.'}">
+            Сервер временно недоступен. Попробуйте позже.
+        </p>
+
+        <div class="error-actions">
+            <a class="primary-button" href="/posts">На главную</a>
+            <a class="secondary-button" href="javascript:location.reload()">Обновить</a>
+        </div>
+    </main>
+
+</div>
+</body>
+</html>

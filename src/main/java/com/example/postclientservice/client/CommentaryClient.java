@@ -4,6 +4,7 @@ import com.example.postclientservice.dto.Dto.CommentaryDto;
 import com.example.postclientservice.dto.Dto.PostDto;
 import com.example.postclientservice.dto.request.CommentaryRequest.CreateCommentaryRequest;
 import com.example.postclientservice.dto.request.CommentaryRequest.UpdateCommentaryRequest;
+import com.example.postclientservice.util.ClientApiException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -39,7 +40,7 @@ public class CommentaryClient {
         if (response.getStatusCode().is2xxSuccessful()) {
             return response.getBody();
         } else {
-            throw new RuntimeException("Find method failed");
+            throw new ClientApiException("Ошибка при обращении к серверу");
         }
 
     }
@@ -50,7 +51,7 @@ public class CommentaryClient {
         if (response.getStatusCode().is2xxSuccessful()){
             return response.getBody();
         }
-        throw new RuntimeException("Save method failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
     }
 
     public CommentaryDto updateById(int id, UpdateCommentaryRequest request) {
@@ -59,7 +60,7 @@ public class CommentaryClient {
         if (response.getStatusCode().is2xxSuccessful()){
             return response.getBody();
         }
-        throw new RuntimeException("Update method failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
 
     }
 
@@ -69,7 +70,7 @@ public class CommentaryClient {
         if (response.getStatusCode().is2xxSuccessful()){
             return;
         }
-        throw new RuntimeException("Delete method failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
     }
 }
 

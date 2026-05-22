@@ -1,65 +1,175 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Update</title>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Редактирование поста</title>
+    <link rel="stylesheet" href="/css/update-post.css">
 </head>
 <body>
+<div class="page-wrapper">
 
-<br>
-<a href="/posts">На главную</a>
-<br>
-<form method="post" th:action="@{/posts/{id}/update(id=${post.id()})}" th:object="${post}">
-    <div>
-        <label for="title">Заголовок:</label>
-        <br>
-        <input type="text" name="title" id="title" th:value="${post.title()}" th:field="*{title}" required>
-    </div>
+    <header class="page-header">
+        <div class="page-header__inner">
+            <a class="page-header__link" href="/posts">На главную</a>
 
-    <div>
-        <label for="text">Текст:</label>
-        <br>
-        <textarea name="text" id="text" rows="10" th:value="${post.text()}" th:field="*{text}" required></textarea>
-    </div>
+            <a class="page-header__user" th:href="@{/me}">
+                <span th:text="${currentUser.fullName()}"></span>
 
-    <div>
-        <button type="submit">Обновить</button>
-    </div>
-</form>
-<div th:if="${post.postImageContainerDto() != null && !post.postImageContainerDto().getPostImages().isEmpty()}">
-    <div th:each="image : ${post.postImageContainerDto().getPostImages()}">
-        <div>
-            <img th:src="${'http://localhost:8080/api'+image.imageUrl()}" alt="Post image" style="max-width: 200px; margin: 5px;">
+                <img class="page-header__avatar"
+                     th:if="${currentUser.profilePictureUrl() != null}"
+                     th:src="${'http://localhost:8080/api' + currentUser.profilePictureUrl()}"
+                     alt="Profile Picture">
+
+                <img class="page-header__avatar"
+                     th:unless="${currentUser.profilePictureUrl() != null}"
+                     src="/images/default-profile.png"
+                     alt="Default Profile Picture">
+            </a>
         </div>
-    </div>
+    </header>
+
+    <main class="container">
+
+        <section class="edit-section">
+            <div class="header-container">
+                <div class="header__text">
+                    <h2>Редактирование поста</h2>
+                </div>
+            </div>
+
+            <form class="post-form"
+                  method="post"
+                  th:action="@{/posts/{id}/update(id=${post.id()})}"
+                  th:object="${postToUpdate}">
+
+                <div th:if="${error != null}"
+                     class="error-message"
+                     th:text="${error}">
+                </div>
+
+                <div class="form-field">
+                    <label class="field-label" for="title">Заголовок</label>
+                    <input class="text-input"
+                           type="text"
+                           id="title"
+                           th:field="*{title}">
+
+                    <div th:if="${#fields.hasErrors('title')}"
+                         class="field-error"
+                         th:errors="*{title}">
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label class="field-label" for="text">Текст</label>
+                    <textarea class="text-area"
+                              id="text"
+                              rows="10"
+                              th:field="*{text}"></textarea>
+
+                    <div th:if="${#fields.hasErrors('text')}"
+                         class="field-error"
+                         th:errors="*{text}">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="primary-button" type="submit">Обновить</button>
+                    <a class="secondary-button"
+                       th:href="@{/posts/{id}(id=${post.id()})}">
+                        Назад к посту
+                    </a>
+                </div>
+            </form>
+
+            <div class="post-images"
+                 th:if="${post.postImageContainerDto() != null && !post.postImageContainerDto().getPostImages().isEmpty()}">
+                <div class="post-image-wrapper"
+                     th:each="image : ${post.postImageContainerDto().getPostImages()}">
+                    <img class="post-image"
+                         th:src="${'http://localhost:8080/api' + image.imageUrl()}"
+                         alt="Post image">
+                </div>
+            </div>
+        </section>
+
+        <section class="comments-section">
+            <div class="section-header">
+                <h2>Комментарии</h2>
+            </div>
+
+            <div th:if="${commentPage != null && !commentPage.content().isEmpty()}"
+                 class="comments-list">
+
+                <article th:each="comment : ${commentPage.content()}"
+                         class="comment-card">
+
+                    <div class="comment-header">
+                        <strong class="comment-author"
+                                th:text="${comment.author() != null ? comment.author().fullName() : '[Удалённый пользователь]'}">
+                        </strong>
+
+                        <span class="comment-date"
+                              th:if="${comment.creationDate() != null}"
+                              th:text="${#temporals.format(comment.creationDate(), 'dd.MM.yyyy HH:mm')}">
+                        </span>
+                    </div>
+
+                    <div class="comment-text" th:text="${comment.text()}"></div>
+
+                    <form th:action="@{/posts/{postId}/commentaries/{id}/delete(postId=${post.id()}, id=${comment.id()})}"
+                          method="post"
+                          onsubmit="return confirm('Удалить этот комментарий?')">
+
+                        <button class="danger-button danger-button--small" type="submit">
+                            Удалить комментарий
+                        </button>
+                    </form>
+                </article>
+            </div>
+
+            <div th:if="${commentPage == null || commentPage.content().isEmpty()}" class="hint">
+                <p>Нет комментариев.</p>
+            </div>
+
+            <nav class="pagination"
+                 th:if="${commentPage != null and commentPage.totalPages() > 1}"
+                 aria-label="Comments pagination">
+
+                <a class="pagination__item pagination__arrow"
+                   th:if="${commentPage.hasPrevious()}"
+                   th:href="@{/posts/{id}/update(id=${post.id()}, commentPage=${commentPage.page() - 1})}">
+                    &lt;
+                </a>
+
+                <span class="pagination__item pagination__arrow pagination__item--disabled"
+                      th:unless="${commentPage.hasPrevious()}">
+                    &lt;
+                </span>
+
+                <a th:each="pageNumber : ${#numbers.sequence(0, commentPage.totalPages() - 1)}"
+                   class="pagination__item"
+                   th:classappend="${pageNumber == commentPage.page()} ? ' pagination__item--active'"
+                   th:href="@{/posts/{id}/update(id=${post.id()}, commentPage=${pageNumber})}"
+                   th:text="${pageNumber + 1}">
+                </a>
+
+                <a class="pagination__item pagination__arrow"
+                   th:if="${commentPage.hasNext()}"
+                   th:href="@{/posts/{id}/update(id=${post.id()}, commentPage=${commentPage.page() + 1})}">
+                    &gt;
+                </a>
+
+                <span class="pagination__item pagination__arrow pagination__item--disabled"
+                      th:unless="${commentPage.hasNext()}">
+                    &gt;
+                </span>
+            </nav>
+        </section>
+
+    </main>
 </div>
-
-
-<!-- Комментарии -->
-<h2>Комментарии</h2>
-
-<!-- Список комментариев -->
-<div th:if="${!comments.getCommentaries().isEmpty()}">
-    <div th:each="comment : ${comments.getCommentaries()}" class="comment">
-        <div>
-            <strong th:text="${comment.author() != null ? comment.author().fullName() : '[Удалённый пользователь]'}"></strong>
-            <span th:text="'(' + ${comment.creationDate()} + ')'"></span>
-        </div>
-        <div th:text="${comment.text()}"></div>
-
-        <!-- Кнопка удаления комментария (автор поста может удалить любой комментарий) -->
-        <form th:action="@{/posts/{postId}/commentaries/{id}/delete(postId=${post.id()}, id=${comment.id()})}" method="post"
-              onsubmit="return confirm('Удалить этот комментарий?')">
-            <button type="submit">Удалить комментарий</button>
-        </form>
-        <hr>
-    </div>
-</div>
-<div th:unless="${!comments.getCommentaries().isEmpty()}">
-    <p>Нет комментариев.</p>
-</div>
-
-<a th:href="@{/posts/{id}(id=${post.id()})}">Назад к посту</a>
-
 </body>
 </html>

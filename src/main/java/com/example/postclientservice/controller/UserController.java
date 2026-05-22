@@ -6,11 +6,14 @@ import com.example.postclientservice.client.UserClient;
 import com.example.postclientservice.dto.WithDto.UserWithPostsDto;
 import com.example.postclientservice.dto.container.UserContainerDto;
 import com.example.postclientservice.dto.request.UserRequest.UpdateUserRequest;
+import com.example.postclientservice.util.EmailAlreadyExistsException;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -62,13 +65,24 @@ public class UserController {
 
     @PostMapping("/me/update")
     @PreAuthorize("hasRole('USER')")
-    public String updateCurrentUser(@RequestParam(required = false) MultipartFile profilePicture, @ModelAttribute("userToUpdate") UpdateUserRequest request){
-        //todo
-        if (profilePicture != null && !profilePicture.isEmpty()) {
-            userClient.updateCurrentUserProfilePicture(profilePicture);
+    public String updateCurrentUser(@RequestParam(required = false) MultipartFile profilePicture,
+                                    @ModelAttribute("userToUpdate") @Valid UpdateUserRequest request,
+                                    BindingResult bindingResult, Model model){
+        try {
+            if (bindingResult.hasErrors()) {
+                  return "user/update-my-page";
+            }
+            //todo
+            if (profilePicture != null && !profilePicture.isEmpty()) {
+                userClient.updateCurrentUserProfilePicture(profilePicture);
+            }
+            userClient.updateCurrentUser(request);
+            return "redirect:/me";
+        } catch (EmailAlreadyExistsException ex) {
+              model.addAttribute("error", ex.getMessage());
+            return "user/update-my-page";
         }
-        userClient.updateCurrentUser(request);
-        return "redirect:/me";
+
     }
 
     @PostMapping("/me/delete")

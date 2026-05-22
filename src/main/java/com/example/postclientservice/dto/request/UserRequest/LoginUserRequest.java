@@ -1,4 +1,12 @@
 package com.example.postclientservice.dto.request.UserRequest;
 
-public record LoginUserRequest (String email,String password){
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
+public record LoginUserRequest (
+        @NotBlank(message = "Введите email")
+        @Email(message = "Некорректный email")
+        String email,
+        String password){
 }

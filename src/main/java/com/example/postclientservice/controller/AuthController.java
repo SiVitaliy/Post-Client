@@ -5,7 +5,10 @@ import com.example.postclientservice.dto.Dto.JwtResponseDto;
 import com.example.postclientservice.dto.Dto.UserDto;
 import com.example.postclientservice.dto.request.UserRequest.LoginUserRequest;
 import com.example.postclientservice.dto.request.UserRequest.RegisterUserRequest;
+import com.example.postclientservice.util.BadLoginException;
+import com.example.postclientservice.util.EmailAlreadyExistsException;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,6 +16,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -51,32 +55,55 @@ public class AuthController {
     }
 
     @PostMapping("/process_login")
-    public String processLogin(@ModelAttribute("user") LoginUserRequest loginUserRequest){
-
-        JwtResponseDto jwt = userClient.login(loginUserRequest);
-         if (jwt == null){
-            return "redirect:/auth/login?error";
+    public String processLogin(@ModelAttribute("user") @Valid LoginUserRequest loginUserRequest, BindingResult bindingResult, Model model){
+        if (bindingResult.hasErrors()) {
+            return "auth/login-page";
         }
-        session.setAttribute("jwt_token", jwt.getToken());
 
-        UserDto user = userClient.getCurrentUser();
-        session.setAttribute("user", user);
-        System.out.println(user.email());
-        System.out.println(user.role());
-        setAuthorities(user);
+        try {
+            JwtResponseDto jwt = userClient.login(loginUserRequest);
+            if (jwt == null || jwt.getToken() == null || jwt.getToken().isBlank()) {
+                model.addAttribute("error", "Ошибка авторизации. Попробуйте позже");
+                return "auth/login-page";
+            }
+            session.setAttribute("jwt_token", jwt.getToken());
 
-        return "redirect:/posts";
+            UserDto user = userClient.getCurrentUser();
+            session.setAttribute("user", user);
+
+            setAuthorities(user);
+
+            return "redirect:/posts";
+        } catch (BadLoginException e) {
+            model.addAttribute("error", e.getMessage());
+            return "auth/login-page";
+        }
+
+
+
     }
 
     @PostMapping("/perform_registration")
-    public String performRegistration(@ModelAttribute("user") RegisterUserRequest registerUserRequest, BindingResult bindingResult) {
-        System.out.println("qwerty");
-        JwtResponseDto jwt = userClient.register(registerUserRequest);
-        session.setAttribute("jwt_token", jwt.getToken());
-        UserDto user = userClient.getCurrentUser();
-        session.setAttribute("user", user);
-        setAuthorities(user);
-        return "redirect:/posts";
+    public String performRegistration(@ModelAttribute("user")@Valid RegisterUserRequest registerUserRequest, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            return "auth/register-page";
+        }
+
+        try {
+            JwtResponseDto jwt = userClient.register(registerUserRequest);
+            if (jwt == null || jwt.getToken() == null || jwt.getToken().isBlank()) {
+                model.addAttribute("error", "Ошибка авторизации. Попробуйте позже");
+                return "auth/register-page";
+            }
+            session.setAttribute("jwt_token", jwt.getToken());
+            UserDto user = userClient.getCurrentUser();
+            session.setAttribute("user", user);
+            setAuthorities(user);
+            return "redirect:/posts";
+        } catch (EmailAlreadyExistsException ex) {
+            model.addAttribute("error", ex.getMessage());
+            return "auth/register-page";
+        }
     }
 
     private void setAuthorities(UserDto user){

@@ -1,5 +1,7 @@
 package com.example.postclientservice.dto.request.CommentaryRequest;
 
-public record UpdateCommentaryRequest(String text) {
+import jakarta.validation.constraints.NotBlank;
+
+public record UpdateCommentaryRequest(@NotBlank String text) {
 
 }

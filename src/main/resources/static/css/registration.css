@@ -108,3 +108,23 @@ form > br {
         border-radius: 16px;
     }
 }
+.field-error {
+    width: 100%;
+    margin-top: 6px;
+    color: #dc2626;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: left;
+}
+
+.form-error {
+    margin-top: 14px;
+    color: #dc2626;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.auth-link {
+    margin-top: 4px;
+}

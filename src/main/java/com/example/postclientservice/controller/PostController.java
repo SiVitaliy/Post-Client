@@ -11,10 +11,12 @@ import com.example.postclientservice.dto.request.CommentaryRequest.CreateComment
 import com.example.postclientservice.dto.request.PostRequest.CreatePostRequest;
 import com.example.postclientservice.dto.request.PostRequest.UpdatePostRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -61,7 +63,11 @@ public class PostController {
 
     @PostMapping("/posts/create")
     @PreAuthorize("hasRole('USER')")
-    public String createPost(@RequestParam(required = false) List<MultipartFile> images, @ModelAttribute("post") CreatePostRequest request, Model model){
+    public String createPost(@RequestParam(required = false) List<MultipartFile> images, @ModelAttribute("post") @Valid CreatePostRequest request,  BindingResult bindingResult,Model model){
+
+        if (bindingResult.hasErrors()) {
+            return "/post/create-post-page";
+        }
         if (images != null && images.size()>5) {
             model.addAttribute("error", "Можно загрузить не больше 5 картинок");
             model.addAttribute("post", request);
@@ -82,14 +88,23 @@ public class PostController {
     @PreAuthorize("hasRole('USER')")
     public String updatePostPage(@RequestParam(defaultValue = "0")  int commentPage,
                                  @PathVariable int id, Model model){
+
         PostWithCommentariesDto post= postClient.getById(id,commentPage);
-        model.addAttribute("post");
+        model.addAttribute("post",post.postDto());
+        model.addAttribute("commentPage",post.commentaryPage());
+        model.addAttribute("postToUpdate", new UpdatePostRequest(post.postDto().title(),post.postDto().text()));
         return "/post/update-post-page";
     }
     @PostMapping("/posts/{id}/update")
     @PreAuthorize("hasRole('USER') and @postService.userIsPostAuthor(#id)")
-    public String updatePost(@PathVariable int id,
-                             @ModelAttribute UpdatePostRequest updatePostRequest){
+    public String updatePost(@RequestParam(defaultValue = "0")  int commentPage, @PathVariable int id,
+                             @ModelAttribute("postToUpdate") @Valid UpdatePostRequest updatePostRequest,BindingResult bindingResult,Model model){
+        if (bindingResult.hasErrors()) {
+            PostWithCommentariesDto post = postClient.getById(id, commentPage);
+            model.addAttribute("post", post.postDto());
+            model.addAttribute("commentPage", post.commentaryPage());
+            return "post/update-post-page";
+        }
         postClient.updateById(id, updatePostRequest);
         return "redirect:/posts/"+id;
     }

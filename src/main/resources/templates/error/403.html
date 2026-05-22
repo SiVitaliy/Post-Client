@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Нет доступа</title>
+    <link rel="stylesheet" href="/css/error-page.css">
+</head>
+<body>
+<div class="page-wrapper">
+
+    <main class="error-card">
+        <div class="error-code">403</div>
+
+        <h1>Нет доступа</h1>
+
+        <p th:text="${message != null ? message : 'У вас нет прав для выполнения этого действия.'}">
+            У вас нет прав для выполнения этого действия.
+        </p>
+
+        <div class="error-actions">
+            <a class="primary-button" href="/posts">На главную</a>
+            <a class="secondary-button" href="/auth/login">Логин</a>
+        </div>
+    </main>
+
+</div>
+</body>
+</html>

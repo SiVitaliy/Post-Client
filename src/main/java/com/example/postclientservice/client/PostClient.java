@@ -8,6 +8,7 @@ import com.example.postclientservice.dto.container.PostContainerDto;
 import com.example.postclientservice.dto.pageResponse.PageResponse;
 import com.example.postclientservice.dto.request.PostRequest.CreatePostRequest;
 import com.example.postclientservice.dto.request.PostRequest.UpdatePostRequest;
+import com.example.postclientservice.util.ClientApiException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,7 +57,7 @@ public class PostClient {
         if (response.getStatusCode().is2xxSuccessful()){
             return response.getBody();
         }
-        throw new RuntimeException("getAll failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
     }
 
     public PostWithCommentariesDto getById(int id,int commentPage){
@@ -67,7 +68,7 @@ public class PostClient {
         if (response.getStatusCode().is2xxSuccessful()){
             return response.getBody();
         }
-        throw new RuntimeException("getById failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
     }
 
 
@@ -78,7 +79,7 @@ public class PostClient {
         if (response.getStatusCode().is2xxSuccessful()){
             return response.getBody();
         }
-        throw new RuntimeException("Save method failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
     }
 
     public PostDto updateById(int id, UpdatePostRequest request){
@@ -87,7 +88,7 @@ public class PostClient {
         if (response.getStatusCode().is2xxSuccessful()){
             return response.getBody();
         }
-        throw new RuntimeException("Update method failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
     }
     public  void deleteById(int id){
         HttpEntity<?> entity = new HttpEntity<>(id,createAuthHeaders());
@@ -95,7 +96,7 @@ public class PostClient {
         if (response.getStatusCode().is2xxSuccessful()){
             return;
         }
-        throw new RuntimeException("Delete method failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
     }
 
 
@@ -116,7 +117,7 @@ public class PostClient {
         if (response.getStatusCode().is2xxSuccessful()){
               return response.getBody();
         }
-        throw new RuntimeException("addImages failed");
+        throw new ClientApiException("Ошибка при обращении к серверу");
     }
 
 
