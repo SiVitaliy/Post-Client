@@ -19,7 +19,7 @@
 
                 <img class="page-header__avatar"
                      th:if="${currentUser.profilePictureUrl() != null}"
-                     th:src="${'http://localhost:8080/api' + currentUser.profilePictureUrl()}"
+                     th:src="${apiBaseUrl + currentUser.profilePictureUrl()}"
                      alt="Profile Picture">
 
                 <img class="page-header__avatar"
@@ -70,7 +70,7 @@
                 <div class="post-image-wrapper"
                      th:each="image : ${post.postDto().postImageContainerDto().getPostImages()}">
                     <img class="post-image"
-                         th:src="${'http://localhost:8080/api' + image.imageUrl()}"
+                         th:src="${apiBaseUrl + image.imageUrl()}"
                          alt="Post image">
                 </div>
             </div>
@@ -132,7 +132,7 @@
                         <div th:if="${comment.author() != null}" class="comment-author__content">
                             <img class="comment-author__avatar"
                                  th:if="${comment.author().profilePictureUrl() != null}"
-                                 th:src="${'http://localhost:8080/api' + comment.author().profilePictureUrl()}"
+                                 th:src="${apiBaseUrl + comment.author().profilePictureUrl()}"
                                  alt="Profile Picture">
 
                             <img class="comment-author__avatar"

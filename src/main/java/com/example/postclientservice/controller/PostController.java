@@ -58,7 +58,7 @@ public class PostController {
     @PreAuthorize("hasRole('USER')")
     public String createPostPage(@ModelAttribute("post") CreatePostRequest request){
 //        model.addAttribute("post",new CreatePostRequest(null,null));
-        return "/post/create-post-page";
+        return "post/create-post-page";
     }
 
     @PostMapping("/posts/create")
@@ -66,7 +66,7 @@ public class PostController {
     public String createPost(@RequestParam(required = false) List<MultipartFile> images, @ModelAttribute("post") @Valid CreatePostRequest request,  BindingResult bindingResult,Model model){
 
         if (bindingResult.hasErrors()) {
-            return "/post/create-post-page";
+            return "post/create-post-page";
         }
         if (images != null && images.size()>5) {
             model.addAttribute("error", "Можно загрузить не больше 5 картинок");
@@ -93,7 +93,7 @@ public class PostController {
         model.addAttribute("post",post.postDto());
         model.addAttribute("commentPage",post.commentaryPage());
         model.addAttribute("postToUpdate", new UpdatePostRequest(post.postDto().title(),post.postDto().text()));
-        return "/post/update-post-page";
+        return "post/update-post-page";
     }
     @PostMapping("/posts/{id}/update")
     @PreAuthorize("hasRole('USER') and @postService.userIsPostAuthor(#id)")

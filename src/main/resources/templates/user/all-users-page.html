@@ -19,7 +19,7 @@
 
                 <img class="page-header__avatar"
                      th:if="${currentUser.profilePictureUrl() != null}"
-                     th:src="${'http://localhost:8080/api' + currentUser.profilePictureUrl()}"
+                     th:src="${apiBaseUrl + currentUser.profilePictureUrl()}"
                      alt="Profile Picture">
 
                 <img class="page-header__avatar"
@@ -62,7 +62,7 @@
 
                 <img class="user-avatar"
                      th:if="${user.profilePictureUrl() != null}"
-                     th:src="${'http://localhost:8080/api' + user.profilePictureUrl()}"
+                     th:src="${apiBaseUrl + user.profilePictureUrl()}"
                      alt="Profile Picture">
 
                 <img class="user-avatar"

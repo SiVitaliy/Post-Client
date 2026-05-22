@@ -19,8 +19,11 @@ public record UpdateUserRequest(
         @PastOrPresent(message = "Дата рождения не может быть в будущем")
         LocalDate yearOfBirth,
 
-        @Size(min = 2, max = 2, message = "Код страны должен состоять из 2 символов")
-        @Pattern(regexp = "^[A-Z]{2}$", message = "Код страны должен состоять из двух заглавных латинских букв")
+
+        @Pattern(
+                regexp = "^$|^[A-Z]{2}$",
+                message = "Код страны должен состоять из двух заглавных латинских букв"
+        )
         String countryCode,
 
         @Size(max = 2000, message = "Описание не должно быть длиннее 2000 символов")

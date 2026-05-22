@@ -42,7 +42,7 @@ public class UserController {
     public String getMyPage(Model model){
         UserWithPostsDto userWithPosts = userClient.getCurrentUserPosts();
         model.addAttribute("currentUserWithPosts",userWithPosts);
-        return "/user/my-page";
+        return "user/my-page";
     }
 
     @GetMapping("/user/{id}")
@@ -76,7 +76,21 @@ public class UserController {
             if (profilePicture != null && !profilePicture.isEmpty()) {
                 userClient.updateCurrentUserProfilePicture(profilePicture);
             }
-            userClient.updateCurrentUser(request);
+            String countryCode = request.countryCode();
+
+            if (countryCode != null && countryCode.isBlank()) {    //TODO убрать нормализацию запроса
+                                                                    // и нормализировать countryCode на сервере
+                countryCode = null;
+            }
+
+            UpdateUserRequest normalizedRequest = new UpdateUserRequest(
+                    request.fullName(),
+                    request.email(),
+                    request.yearOfBirth(),
+                    countryCode,
+                    request.bio()
+            );
+            userClient.updateCurrentUser(normalizedRequest);
             return "redirect:/me";
         } catch (EmailAlreadyExistsException ex) {
               model.addAttribute("error", ex.getMessage());

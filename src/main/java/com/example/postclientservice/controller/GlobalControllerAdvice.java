@@ -3,6 +3,7 @@ import com.example.postclientservice.dto.Dto.CountryOption;
 import com.example.postclientservice.dto.Dto.UserDto;
 import com.example.postclientservice.service.CountryOptionService;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
@@ -15,6 +16,8 @@ import java.util.stream.Collectors;
 public class GlobalControllerAdvice {
     private final HttpSession session;
     private final CountryOptionService countryOptionService;
+    @Value("${post.client.base-url}")
+    private String apiBaseUrl;
 
     public GlobalControllerAdvice(HttpSession session, CountryOptionService countryOptionService) {
         this.session = session;
@@ -41,4 +44,12 @@ public class GlobalControllerAdvice {
                         CountryOption::name
                 ));
     }
+
+
+
+    @ModelAttribute("apiBaseUrl")
+    public String apiBaseUrl() {
+        return apiBaseUrl;
+    }
+
 }

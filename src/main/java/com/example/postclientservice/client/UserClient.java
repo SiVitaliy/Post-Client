@@ -130,6 +130,8 @@ public class UserClient {
     public UserDto updateCurrentUser(UpdateUserRequest request) {
         try {
             HttpEntity<?> entity = new HttpEntity<>(request,createAuthHeaders());
+
+
             UserDto currentUser = getCurrentUserFromSession();
             ResponseEntity<UserDto> response = restTemplate.exchange(baseUrl+"/me",HttpMethod.PUT,entity, UserDto.class);
             if (response.getStatusCode().is2xxSuccessful()){

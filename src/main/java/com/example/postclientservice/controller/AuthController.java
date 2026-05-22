@@ -46,7 +46,7 @@ public class AuthController {
 
     @GetMapping("/login")
     public String loginPage(@ModelAttribute("user") LoginUserRequest loginUserRequest){
-        return "/auth/login-page";
+        return "auth/login-page";
     }
 
     @GetMapping("/registration")
