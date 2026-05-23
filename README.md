@@ -1,7 +1,5 @@
 # Post Client Service
-[![Java](https://img.shields.io/badge/Java-21-blue.svg)](https://adoptium.net/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-brightgreen.svg)](https://spring.io/projects/spring-boot)
-[![Thymeleaf](https://img.shields.io/badge/Thymeleaf-red.svg)](https://www.thymeleaf.org/)
+
 
 [![Java](https://img.shields.io/badge/Java-blue.svg)](https://adoptium.net/)
 
