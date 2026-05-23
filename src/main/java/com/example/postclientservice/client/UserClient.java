@@ -3,14 +3,12 @@ package com.example.postclientservice.client;
 import com.example.postclientservice.dto.Dto.JwtResponseDto;
 import com.example.postclientservice.dto.Dto.UserDto;
 import com.example.postclientservice.dto.WithDto.UserWithPostsDto;
+import com.example.postclientservice.dto.WithDto.UserWithTokenDto;
 import com.example.postclientservice.dto.container.UserContainerDto;
 import com.example.postclientservice.dto.request.UserRequest.LoginUserRequest;
 import com.example.postclientservice.dto.request.UserRequest.RegisterUserRequest;
 import com.example.postclientservice.dto.request.UserRequest.UpdateUserRequest;
-import com.example.postclientservice.util.BadLoginException;
-import com.example.postclientservice.util.ClientApiException;
-import com.example.postclientservice.util.ClientForbiddenException;
-import com.example.postclientservice.util.EmailAlreadyExistsException;
+import com.example.postclientservice.util.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -133,13 +131,17 @@ public class UserClient {
 
 
             UserDto currentUser = getCurrentUserFromSession();
-            ResponseEntity<UserDto> response = restTemplate.exchange(baseUrl+"/me",HttpMethod.PUT,entity, UserDto.class);
+            ResponseEntity<UserWithTokenDto> response = restTemplate.exchange(baseUrl+"/me",HttpMethod.PUT,entity, UserWithTokenDto.class);
             if (response.getStatusCode().is2xxSuccessful()){
-                session.setAttribute("user",response.getBody());
-                return response.getBody();
+                session.setAttribute("jwt_token", response.getBody().jwt().getToken());
+                session.setAttribute("user",response.getBody().userDto());
+                return response.getBody().userDto();
             }
         } catch (HttpClientErrorException.Conflict ex){
             throw new EmailAlreadyExistsException("Такой email уже зарегистрирован");
+        }
+        catch (HttpClientErrorException.BadRequest ex){
+            throw new BadDataException("Дата рождения выглядит некорректной");
         }
         throw new ClientApiException("Ошибка при обращении к серверу");
 

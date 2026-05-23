@@ -6,6 +6,7 @@ import com.example.postclientservice.client.UserClient;
 import com.example.postclientservice.dto.WithDto.UserWithPostsDto;
 import com.example.postclientservice.dto.container.UserContainerDto;
 import com.example.postclientservice.dto.request.UserRequest.UpdateUserRequest;
+import com.example.postclientservice.util.BadDataException;
 import com.example.postclientservice.util.EmailAlreadyExistsException;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -91,8 +92,9 @@ public class UserController {
                     request.bio()
             );
             userClient.updateCurrentUser(normalizedRequest);
+
             return "redirect:/me";
-        } catch (EmailAlreadyExistsException ex) {
+        } catch (EmailAlreadyExistsException | BadDataException ex) {
               model.addAttribute("error", ex.getMessage());
             return "user/update-my-page";
         }
