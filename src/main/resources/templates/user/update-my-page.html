@@ -154,6 +154,22 @@
                 <a class="secondary-button" th:href="@{/me}">Отмена</a>
             </div>
         </form>
+        <section class="danger-zone">
+            <div class="danger-zone__content">
+                <div>
+                    <h3>Удаление аккаунта</h3>
+                    <p>Это действие нельзя отменить. Аккаунт и связанные данные будут удалены.</p>
+                </div>
+
+                <form method="post"
+                      th:action="@{/me/delete}"
+                      onsubmit="return confirm('Вы точно хотите удалить аккаунт? Это действие нельзя отменить.');">
+                    <button class="danger-button" type="submit">
+                        Удалить аккаунт
+                    </button>
+                </form>
+            </div>
+        </section>
     </main>
 
 </div>
