@@ -3,9 +3,16 @@
 
 [![Java](https://img.shields.io/badge/Java-blue.svg)](https://adoptium.net/)
 
-[![Spring](https://img.shields.io/badge/Spring%20Boot-brightgreen.svg)](https://spring.io/projects/spring-boot) 
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Spring MVC](https://img.shields.io/badge/Spring%20MVC-6DB33F.svg)](https://docs.spring.io/spring-framework/reference/web/webmvc.html)
+[![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F.svg)](https://spring.io/projects/spring-security)
 
+[![REST API](https://img.shields.io/badge/REST%20API-orange.svg)](https://restfulapi.net/)
 [![Thymeleaf](https://img.shields.io/badge/Thymeleaf-red.svg)](https://www.thymeleaf.org/)
+
+[![HTML](https://img.shields.io/badge/HTML-E34F26.svg)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[![CSS](https://img.shields.io/badge/CSS-1572B6.svg)](https://developer.mozilla.org/en-US/docs/Web/CSS)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
 `PostClientService` — web-клиент для PostApp, написанный на Spring MVC + Thymeleaf.
 
