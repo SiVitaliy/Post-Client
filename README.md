@@ -16,7 +16,7 @@
 
 `PostClientService` — web-клиент для PostApp, написанный на Spring MVC + Thymeleaf.
 
-Клиент рендерит HTML-страницы, хранит JWT в `HttpSession` и взаимодействует с отдельным REST API сервером — `PostRestService`.
+Клиент рендерит HTML-страницы, хранит JWT в `HttpSession` и взаимодействует с отдельным REST API сервером — [`PostRestService`](https://github.com/SiVitaliy/post-rest-api).
 
 ## Live demo
 
