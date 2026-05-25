@@ -22,6 +22,10 @@ public class SecurityConfig {
     public SecurityConfig(UserClient userClient) {
         this.userClient = userClient;
     }
+    @Bean
+    public String MySpnrigBean(){
+        return "new bean ";
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
