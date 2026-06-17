@@ -18,13 +18,7 @@
 
 Клиент рендерит HTML-страницы, хранит JWT в `HttpSession` и взаимодействует с отдельным REST API сервером — [`PostRestService`](https://github.com/SiVitaliy/post-rest-api).
 
-## Live demo
 
-Приложение доступно на Render:
-
-https://post-client.onrender.com/auth/registration
-
-> Примечание: проект размещен на бесплатном тарифе Render, поэтому первый запрос после простоя может выполняться дольше.
 
 ---
 
